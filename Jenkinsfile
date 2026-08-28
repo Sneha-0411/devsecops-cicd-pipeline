@@ -1,13 +1,12 @@
-
 pipeline {
     agent any
 
     environment {
-        registry = "snehadarbarwar/cicd-lab"
-        registryCredential = "dockerhub"
+        REGISTRY = "snehadarbarwar/cicd-lab"
     }
 
     stages {
+
         stage('Clone') {
             steps {
                 checkout scm
@@ -16,33 +15,36 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build(registry)
-                }
+                bat 'docker build -t %REGISTRY% .'
             }
         }
 
         stage('Security Scan') {
             steps {
-                sh '''
-                docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image ${registry}
-                '''
+                bat 'docker run --rm aquasec/trivy image %REGISTRY%'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS')]) {
+
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                }
             }
         }
 
         stage('Push Image') {
             steps {
-                script {
-                    docker.withRegistry('', registryCredential) {
-                        docker.image(registry).push('latest')
-                    }
-                }
+                bat 'docker push %REGISTRY%'
             }
         }
 
         stage('Cleanup') {
             steps {
-                sh "docker rmi ${registry}:latest || true"
+                bat 'docker rmi %REGISTRY% || exit /b 0'
             }
         }
     }
