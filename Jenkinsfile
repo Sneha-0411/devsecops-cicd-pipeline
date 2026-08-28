@@ -22,16 +22,17 @@ pipeline {
         stage('Security Scan') {
             steps {
                 bat 'docker run --rm -v //var/run/docker.sock:/var/run/docker.sock aquasec/trivy image %REGISTRY%'
-            }
+        }
         }
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub',
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
                     usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS')]) {
-
-                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    powershell '$env:DOCKER_PASS | docker login -u $env:DOCKER_USER --password-stdin'
                 }
             }
         }
