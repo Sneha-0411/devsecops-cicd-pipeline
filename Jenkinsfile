@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        registry = "YOUR_DOCKERHUB_USERNAME/cicd-lab"
+        registry = "snehadarbarwar/cicd-lab"
         registryCredential = "dockerhub"
     }
 
