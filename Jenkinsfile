@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         REGISTRY = "snehadarbarwar/cicd-lab"
+        DOCKER_HOST = "tcp://localhost:2375"
     }
 
     stages {
