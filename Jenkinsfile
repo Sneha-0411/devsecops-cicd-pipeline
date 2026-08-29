@@ -22,7 +22,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 bat 'docker save -o image.tar %REGISTRY%'
-                bat 'docker run --rm -v "%CD%:/workspace" aquasec/trivy image --input /workspace/image.tar'
+                bat 'docker run --rm -v "%WORKSPACE%:/workspace" aquasec/trivy:latest image --input /workspace/image.tar'
             }
         }
 
@@ -46,7 +46,11 @@ pipeline {
 
         stage('Cleanup') {
             steps {
-                bat 'docker rmi %REGISTRY% || exit /b 0'
+                bat '''
+                    docker rmi %REGISTRY%
+                    del image.tar 2>nul
+                    exit /b 0
+                '''
             }
         }
     }
