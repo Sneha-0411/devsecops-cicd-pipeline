@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         REGISTRY = "snehadarbarwar/cicd-lab"
-        DOCKER_HOST = "tcp://localhost:2375"
     }
 
     stages {
@@ -22,8 +21,8 @@ pipeline {
 
         stage('Security Scan') {
             steps {
-                bat 'docker run --rm -v //var/run/docker.sock:/var/run/docker.sock aquasec/trivy image %REGISTRY%'
-        }
+                bat 'docker run --rm aquasec/trivy image %REGISTRY%'
+            }
         }
 
         stage('Docker Login') {
