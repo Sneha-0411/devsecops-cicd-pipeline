@@ -21,7 +21,8 @@ pipeline {
 
         stage('Security Scan') {
             steps {
-                bat 'docker run --rm aquasec/trivy image %REGISTRY%'
+                bat 'docker save -o image.tar %REGISTRY%'
+                bat 'docker run --rm -v "%CD%:/workspace" aquasec/trivy image --input /workspace/image.tar'
             }
         }
 
